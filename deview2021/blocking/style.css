@@ -1,0 +1,34 @@
+.container {
+  margin: 0 10rem;
+}
+
+h1 {
+  color: crimson;
+  text-align: center;
+}
+
+input[type="text"] {
+  width: 97%;
+  padding: 0.5rem;
+}
+
+input[type="radio"] {
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+ul {
+  width: 100%;
+  margin: 1.5rem 0;
+  padding: 0;
+}
+
+li {
+  background-color: brown;
+  width: 4px;
+  height: 4px;
+  float: left;
+  list-style: none;
+  margin: 1px;
+  padding: 0;
+}

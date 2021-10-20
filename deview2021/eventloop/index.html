@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Event Loop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        text-align: center;
+        margin: 5rem 30rem;
+      }
+      input,
+      body,
+      button,
+      .log {
+        font-size: 5rem;
+      }
+      .yield {
+        background-color: salmon;
+      }
+      #yieldLog {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+      }
+      #log {
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <span id="yieldLog"></span>
+      <input type="number" id="num" placeholder="Loop count" value="10000" />
+      <button id="btn">Loop</button>
+      <div id="log"></div>
+    </div>
+  </body>
+  <script>
+    const queue = [];
+    const frameInterval = 5;
+    let currentTask = null;
+    let startTime = -1;
+    let paused = false;
+
+    const performWorkUntilDeadline = () => {
+      startTime = performance.now();
+      currentTask = flushWork(currentTask);
+      if (currentTask) {
+        schedulePerformWorkUntilDeadline();
+      }
+    };
+
+    const channel = new MessageChannel();
+    const port = channel.port2;
+    channel.port1.onmessage = performWorkUntilDeadline;
+    schedulePerformWorkUntilDeadline = () => {
+      port.postMessage(null);
+    };
+
+    function shouldYield() {
+      const timeElapsed = performance.now() - startTime;
+      return timeElapsed > frameInterval;
+    }
+
+    function flushWork(currentTask) {
+      let count = 0;
+      while (currentTask && !shouldYield()) {
+        yieldLog.className = shouldYield() ? "yield" : "";
+        count++;
+      }
+      log.innerText = `Time slice [${currentTask}] worked ${count}`;
+      return queue.shift();
+    }
+
+    function main(length) {
+      while (length--) {
+        queue.push(length);
+      }
+      performWorkUntilDeadline();
+    }
+
+    btn.addEventListener("click", () => {
+      main(num.value);
+    });
+  </script>
+</html>
+
